@@ -37,25 +37,16 @@
                         code: 400,
                     });
                 }
-
-                const token = getJWT.generateToken({ user: user._id });
-                getJWT.decodeToken(token, (err, decoded) => {
-                    if (err) {
-                        return res.status(400).json({
-                            error: err.message,
-                            code: 400,
-                        });
-                    }
-                    return res.status(200).json({
-                        user,
-                        token,
-                        expiry: decoded.exp,
-                        code: 200,
-                    });
+              
+                const token = JWT.generate({ user: user._id });
+                return res.status(200).json({
+                    user,
+                    token,
+                    code: 200,
                 });
             } else {
                 let ErrorMsg = email
-                    ? "Email does not exist"
+                    ? "Account does not exist"
                     : username
                     ? "Username does not exist"
                     : "Invalid email/username";

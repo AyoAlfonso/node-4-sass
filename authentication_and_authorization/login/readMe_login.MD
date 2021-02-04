@@ -31,9 +31,9 @@ On line 8 of the login function we check if we got a user object, if nothing is 
 Technically the mongoDB `User.aggregate()` method will return an empty array, if a user object with the specified attributes doesn't exist. And it returns the first element from the return array.
 ```
 
-In line 47 of the getUserByAggregate function we return null if no result is sent to mimick the behaviour a normal User.find() method. This might not be encouraged in other parts of the application but this is what the case is right now, as we only need one user or nothing.
+On line 47 code_sample_get_user.js file, the getUserByAggregate function returns null if user is found to satisfy the condition, we are doing this to mimick the behaviour a normal User.find() method. This might not be encouraged in other parts of the application but since the case is to find a user right now, we only should return 1 object or nothing not an array of objects.
 
-On line 14 of the `getUserByAggregate()` function we do a look up from other collections stated with `from` and using the `localField` for the user ID in the user object and what the field is called in the other collection using the `foreignField` to match the values we are looking for.
+In the `getUserByAggregate()` function we do a $look up from other collections stated with `from` and using the `localField` for the user ID in the user object and what the field is called in the other collection using the `foreignField` to match the values we are looking for.
 
 Doing this will load the user we need and the attributes that belongs to it. However we are not done authenticating.
 
@@ -47,7 +47,21 @@ The [bycypt](https://www.npmjs.com/package/bcrypt) module has a number of method
     );
 ```
 
-On line 42 of the `getJWT.decodeToken()` method. We also generate a token for the user after logging in successfully. Here the token is generated and sent with the body but we can attach it to the header of the request `req.header.Authorization` attributes for a more cleaner/secure approach. The user can then attach it to thier headers and use it to authenticate their connection to the server consecutively until the token expires.
+On line 41 of the code_sample_login.js file we use the `getJWT.generate()` helper method from code_sample_token_mgt.js to generate a token for the user after logging in successfully. Here the token is generated and sent with the response body but we can attach it to the header of the request `req.header.Authorization` attributes for a more cleaner/secure approach. The user can then attach it to thier headers and use it to authenticate their every request to the server until the token expires.
 
+NB: On sending the user object to the client we want to make sure we are not sending the important data that should be hidden for example password.
+
+A way to do that is to add this object to the schema of your MongoDB user model to transform the MongoDB document file and delete the field(s) you want to get rid of.
+
+```js
+   {
+        toJSON: {
+            transform: function(doc, ret) {
+                delete ret.password;
+                delete ret.token
+            },
+        },
+    }
+```
 
 End of chapter.
